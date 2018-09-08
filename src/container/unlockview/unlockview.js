@@ -126,7 +126,7 @@ export default class unlockview extends Component {
                     }
                 })
                 .catch( (error) => {
-                    console.log('cycle error', error); // eslint-disable-line  no-console
+                    //console.log('cycle error', error); // eslint-disable-line  no-console
                     this.handleerror();
                     clearInterval(this.state.interval);
                     return { error };
@@ -145,7 +145,7 @@ export default class unlockview extends Component {
             //console.log("Interval=" +temp);
             this.setState({interval: temp});
         }else{
-            console.log('result error', error);
+            //console.log('result error', error);
             this.handleerror();
         }
     }
@@ -179,7 +179,7 @@ export default class unlockview extends Component {
                 }).then(jsonParse)
                 .then(this.handleresult.bind(this))
                 .catch( (error) => {
-                    console.log('request error', error); // eslint-disable-line  no-console
+                    //console.log('request error', error); // eslint-disable-line  no-console
                     this.handleerror();
                     return { error };
                 });

@@ -30,13 +30,6 @@ export default class foot extends Component {
             active:false
         }
     }
-    update_active(active){
-        if(active){
-            this.setState({content:'设备已绑定网关',active:true});
-        }else{
-            this.setState({content:'设备未绑定网关',active:false});
-        }
-    }
     update_size(height){
         this.setState({height:height})
     }

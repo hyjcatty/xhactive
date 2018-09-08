@@ -11,6 +11,7 @@ import classNames from 'classnames';
 import Foot from "../foot/foot"
 import Head from "../head/head"
 import Activateview from "../container/activateview/activateview"
+import Loopview from "../container/loopview/loopview"
 import Uploadview from "../container/Uploadview/Uploadview"
 import Stationview from "../container/stationview/stationview"
 import Loginview from "../container/loginview/loginview"
@@ -41,7 +42,8 @@ class App extends Component{
             userid: "user",
             username:"Activate",
             hculist: [],
-            active:false
+            cpuactive:false,
+            stationactive:false
         };
     }
     getuser(){
@@ -62,17 +64,47 @@ class App extends Component{
         this.refs.Uploadview.update_size(width,canvasheight);
         this.refs.Stationview.update_size(width,canvasheight);
         this.refs.Sysconfview.update_size(width,canvasheight,headfootheight);
+        this.refs.Loopview.update_size(width,canvasheight);
     }
-    update_active(active){
-        this.setState({active:active});
-        this.refs.foot.update_active(active);
+    update_cpu_active(cpu){
+        this.setState({cpuactive:cpu});
     }
-    if_active(){
-        return this.state.active;
+    update_station_active(station){
+        this.setState({stationactive:station});
+        if(!station) this.refs.Stationview.updatebinding(null);
     }
-    initializesysconf(savecallback,configuration){
+    update_binding_station(station){
+        this.refs.Stationview.updatebinding(station);
+    }
+    loop_second(second){
+        this.refs.Loopview.update_second(second);
+    }
+    loop_result(bool){
+        if(bool){
+            this.refs.Loopview.update_status("Success");
+        }else{
+            this.refs.Loopview.update_status("Fail");
+        }
+    }
+    if_cpu_active(){
+        return this.state.cpuactive;
+    }
+    if_station_active(){
+        return this.state.stationactive;
+    }
+    foot_content_station(){
+        if(this.state.cpuactive) return "设备未绑定站点";
+        else return "设备已绑定站点";
+    }
+    foot_content_cpu(){
+        if(this.state.cpuactive) return "设备未绑定网关";
+        else return "设备已绑定网关";
+    }
+    initializesysconf(savecallback,backcallback,configuration){
 
         this.refs.Sysconfview.update_callback_save(savecallback);
+
+        this.refs.Sysconfview.update_callback_back(backcallback);
         this.refs.Sysconfview.update_config(configuration);
     }
     initializeLogin(callback){
@@ -85,17 +117,21 @@ class App extends Component{
         this.refs.Listview.update_locklist(map);
         this.refs.Listview.updatecallback(callback);
     }
-    initializeBase(map,callback,callback2){
+    initializeBase(map,callback,callback2,callback3,callback4,callback5){
         this.refs.Baseview.update_info(map);
-        this.refs.Baseview.updatecallback(callback,callback2);
+        this.refs.Baseview.updatecallback(callback,callback2,callback3,callback4,callback5);
     }
     initializefoot(callback){
         this.refs.foot.update_callback(callback);
     }
-    initializestation(projlist,statlist,callback){
+    initializestation(projlist,statlist,callback,callback2){
         this.refs.Stationview.update_freestationlist(statlist);
         this.refs.Stationview.update_projlist(projlist);
-        this.refs.Stationview.updatecallback(callback);
+        this.refs.Stationview.updatecallback(callback,callback2);
+    }
+    initializeloop(code,callback1,callback2){
+        this.refs.Loopview.update_callback(callback1,callback2);
+        this.refs.Loopview.update_code(code);
     }
     getSelectedStat(){
         return this.refs.Stationview.getSelectedStat();
@@ -109,7 +145,20 @@ class App extends Component{
     updateactivenotes(notes){
         this.refs.Activateview.update_notes(notes);
     }
+    showloopview(){
+        this.refs.Loopview.show();
+        this.refs.Loginview.hide();
+        this.refs.Stationview.hide();
+        this.refs.Sysconfview.hide();
+        this.refs.Uploadview.hide();
+        this.refs.Activateview.hide();
+        this.refs.Listview.hide();
+        this.refs.foot.hide();
+        this.refs.Baseview.hide();
+        this.refs.foot.update_content("回环测试工具");
+    }
     showloginview(){
+        this.refs.Loopview.hide();
         this.refs.Loginview.show();
         this.refs.Stationview.hide();
         this.refs.Sysconfview.hide();
@@ -118,8 +167,10 @@ class App extends Component{
         this.refs.Listview.hide();
         this.refs.foot.hide();
         this.refs.Baseview.hide();
+        this.refs.foot.update_content("激活管理工具");
     }
     showactiveview(){
+        this.refs.Loopview.hide();
         this.refs.Loginview.hide();
         this.refs.Stationview.hide();
         this.refs.Uploadview.hide();
@@ -129,8 +180,11 @@ class App extends Component{
         this.refs.Listview.hide();
         this.refs.foot.hide();
         this.refs.Baseview.hide();
+
+        this.refs.foot.update_content("");
     }
     showuploadview(){
+        this.refs.Loopview.hide();
         this.refs.Loginview.hide();
         this.refs.Sysconfview.hide();
         this.refs.Stationview.hide();
@@ -140,8 +194,11 @@ class App extends Component{
         this.refs.Listview.hide();
         this.refs.foot.hide();
         this.refs.Baseview.hide();
+
+        this.refs.foot.update_content("上传照片以完成激活");
     }
     showstationview(){
+        this.refs.Loopview.hide();
         this.refs.Loginview.hide();
         this.refs.Sysconfview.hide();
         this.refs.Stationview.show();
@@ -152,8 +209,10 @@ class App extends Component{
 
         this.refs.Baseview.hide();
         this.refs.foot.show("设备");
+        this.refs.foot.update_content("设备站点信息");
     }
     showlistview(){
+        this.refs.Loopview.hide();
         this.refs.Loginview.hide();
         this.refs.Sysconfview.hide();
         this.refs.Stationview.hide();
@@ -162,8 +221,11 @@ class App extends Component{
         this.refs.Listview.show();
         this.refs.Baseview.hide();
         this.refs.foot.show("站点");
+
+        this.refs.foot.update_content("选择网关用以绑定设备");
     }
     showbaseview(){
+        this.refs.Loopview.hide();
         this.refs.Loginview.hide();
         this.refs.Sysconfview.hide();
         this.refs.Stationview.hide();
@@ -172,8 +234,10 @@ class App extends Component{
         this.refs.Listview.hide();
         this.refs.Baseview.show();
         this.refs.foot.show("站点");
+        this.refs.foot.update_content("设备网关基本信息");
     }
     showsysconfview(){
+        this.refs.Loopview.hide();
         this.refs.Loginview.hide();
         this.refs.Sysconfview.show();
         this.refs.Stationview.hide();
@@ -182,6 +246,7 @@ class App extends Component{
         this.refs.Listview.hide();
         this.refs.Baseview.hide();
         this.refs.foot.show("站点");
+        this.refs.foot.update_content("请输入校准数据");
     }
     buttonlock(input){
         this.refs.foot.disable(input);
@@ -189,7 +254,7 @@ class App extends Component{
     setuser(username,userid){
         this.setState({userid:userid,username:username});
         this.refs.head.update_username(this.state.username);
-        this.showstationview();
+        //this.showstationview();
     }
     render() {
         return(
@@ -200,6 +265,7 @@ class App extends Component{
             <div>
                 <Uploadview ref="Uploadview"/>
                 <Activateview ref="Activateview"/>
+                <Loopview ref="Loopview"/>
                 <Stationview ref="Stationview"/>
                 <Loginview ref="Loginview"/>
                 <Listview ref="Listview"/>
@@ -223,13 +289,15 @@ get_size();
 var project_list = [];
 var free_station =[];
 
-//fetchFreeStation();
 
 var wechat_id = getWechatScope();
+var session_id= getSession();
 var react_element = <App/>;
 var app_handle = ReactDOM.render(react_element,document.getElementById('app'));
 var cycle_number = 0;
 var Intervalhandle;
+var Loop_second = 0;
+var Loophandle;
 var basic_address = getRelativeURL()+"/";
 var upload_url=basic_address+"upload.php";
 fetchProjectList();
@@ -240,16 +308,17 @@ $('#file-zh').fileinput({
     showPreview : true,
     maxFileSize:5000
 });
-//app_handle.initializebuttonlock(lockbuttoncallback);
-//app_handle.initializeUrl(request_head);
-app_handle.initializeSize(winWidth,winHeight);
-//app_handle.updateactivecode(wechat_id);
-//app_handle.initializehead(wechat_id);
-//app_handle.showuploadview();
 
+app_handle.initializeSize(winWidth,winHeight);
 app_handle.initializeLogin(login_binding);
 app_handle.initializefoot(shift);
-app_handle.showloginview();
+app_handle.initializeloop(wechat_id,fetchstartloop,hcubacksysconf);
+app_handle.updateactivecode(wechat_id);
+if(session_id !== null){
+    session_binding(session_id);
+}else{
+    app_handle.showloginview();
+}
 getLocation();
 
 
@@ -388,7 +457,7 @@ function fetchactivate(){
         longitude:""+Longitude
     };
     let listreq = {
-        action:"HCU_Lock_Activate",
+        action:"HCU_Station_Bind",
         body:body,
         type:"query",
         user:"activeuser"
@@ -462,9 +531,7 @@ function changeview(){
 }
 function fetchFreeStationcallback(res){
     free_station = res.jsonResult.ret;
-    //console.log(free_station);
-    //console.log(project_list);
-    app_handle.initializestation(project_list,free_station,changeview);
+    app_handle.initializestation(project_list,free_station,changeview,fetchunbind);
     return;
 
 }
@@ -479,6 +546,18 @@ function getWechatScope(){
         }
     }
     return "test";
+}
+function getSession(){
+    var url = document.location.toString();
+    if(url.indexOf("session=")!=-1){
+        var arrUrl= url.split("session=");
+        var scope_value = arrUrl[1].split("&")[0];
+        //log("code="+scope_value);
+        if(scope_value.length>0 ){
+            return scope_value;
+        }
+    }
+    return null;
 }
 function login_binding(username,password){
 
@@ -521,10 +600,72 @@ function login_binding_callback(res){
     }
     let userinfo = res.jsonResult.ret;
     app_handle.setuser(userinfo.username,userinfo.userid);
-    if(userinfo.CPU === "true")
-        app_handle.update_active(true);
-    else
-        app_handle.update_active(false);
+    let cpu=false;
+    let station=false;
+    if(userinfo.CPU === "true") cpu = true;
+    if(userinfo.station === "true") station = true;
+    app_handle.update_cpu_active(cpu);
+    app_handle.update_station_active(station);
+    if(station){
+        fetchstation();
+    }else{
+        app_handle.showstationview();
+    }
+    //fetchlist();
+}
+
+function session_binding(session){
+    var body = {
+        code:wechat_id,
+        session:session
+    };
+    var map={
+        action:"HCU_Session_Binding",
+        type:"query",
+        body: body,
+        user:"null"
+    };
+    app_handle.showloginview();
+    fetch(request_head,
+        {
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(map)
+        }).then(jsonParse)
+        .then(session_binding_callback)
+        //.then(fetchlist)
+        .catch( (error) => {
+            console.log('request error', error);
+            return { error };
+        });
+}
+function session_binding_callback(res){
+    if(res.jsonResult.status == "false"){
+        alert("未找到会话，请登录"+res.jsonResult.msg);
+        app_handle.showloginview();
+        return;
+    }
+    if(res.jsonResult.auth == "false"){
+        alert("登陆错误"+res.jsonResult.msg);
+        app_handle.showloginview();
+        return;
+    }
+    let userinfo = res.jsonResult.ret;
+    app_handle.setuser(userinfo.username,userinfo.userid);
+    let cpu=false;
+    let station=false;
+    if(userinfo.CPU === "true") cpu = true;
+    if(userinfo.station === "true") station = true;
+    app_handle.update_cpu_active(cpu);
+    app_handle.update_station_active(station);
+    if(station){
+        fetchstation();
+    }else{
+        app_handle.showstationview();
+    }
     //fetchlist();
 }
 function cpu_binding(cpu){
@@ -575,13 +716,17 @@ function cpu_binding_callback(res){
 }
 function shift(name){
     if(name ==="设备"){
-        if(app_handle.if_active()){
+        if(app_handle.if_cpu_active()){
             fetchinfo();
         }else{
             fetchlist();
         }
     }else{
-        app_handle.showstationview();
+        if(app_handle.if_station_active()) {
+            fetchstation();
+        }else{
+            app_handle.showstationview();
+        }
     }
 }
 
@@ -645,10 +790,13 @@ function info_callback(res){
         return;
     }
     let getinfolist = res.jsonResult.ret;
-    app_handle.initializeBase(getinfolist,fetchinfo,sysconffetch);
+    app_handle.initializeBase(getinfolist,fetchinfo,sysconffetch,fetchlist,showloop,fetchreboot);
 
     app_handle.showbaseview();
     //app_handle.listview();
+}
+function showloop(){
+    app_handle.showloopview();
 }
 function fetchinfo(){
     var body={
@@ -675,7 +823,49 @@ function fetchinfo(){
             return { error };
         });
 }
+function station_callback(res){
+    if(res.jsonResult.status == "false"){
+        return;
+    }
+    if(res.jsonResult.auth == "false"){
+        return;
+    }
+    let getstation = res.jsonResult.ret;
+    //console.log("test");
+    app_handle.update_binding_station(getstation);
+    app_handle.showstationview();
 
+    //console.log("test2");
+
+}
+function fetchstation(){
+    var body={
+        key:wechat_id
+    }
+    var listreq = {
+        action:"HCU_Get_Binding_Station",
+        body:body,
+        type:"query",
+        user:app_handle.getuser()
+    };
+    fetch(request_head,
+        {
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(listreq)
+        }).then(jsonParse)
+        .then(station_callback)
+        .catch( (error) => {
+            console.log('request error', error);
+            return { error };
+        });
+}
+function hcubacksysconf(){
+    app_handle.showbaseview();
+}
 function hcusavesysconf(configure){
 
     var map={
@@ -748,11 +938,182 @@ function sysconffetchcallback(res){
     }
     let configuration = res.jsonResult.ret;
 
-    app_handle.initializesysconf(hcusavesysconf,configuration);
+    app_handle.initializesysconf(hcusavesysconf,hcubacksysconf,configuration);
     app_handle.showsysconfview();
 }
 
+function unbind_callback(res){
+    if(res.jsonResult.status == "false"){
+        alert('解除绑定失败，请联系管理员');
+        return;
+    }
+    if(res.jsonResult.auth == "false"){
+        return;
+    }
+    fetchProjectList();
+    app_handle.update_station_active(false);
+    app_handle.showstationview();
 
+
+}
+function fetchunbind(){
+    //console.log(app_handle.getSelectedStat());
+    let body={
+        code:wechat_id
+    };
+    let listreq = {
+        action:"HCU_Station_Unbind",
+        body:body,
+        type:"query",
+        user:"activeuser"
+    };
+    fetch(request_head,
+        {
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(listreq)
+        }).then(jsonParse)
+        .then(unbind_callback)
+        .catch( (error) => {
+            console.log('request error', error);
+            return { error };
+        });
+}
+function startloop_callback(res){
+    if(res.jsonResult.status == "false"){
+        return;
+    }
+    if(res.jsonResult.auth == "false"){
+        return;
+    }
+    Loop_second = 0;
+    Loophandle = setTimeout(function(){
+        fetchloopstatus();
+    },1000);
+
+}
+function fetchstartloop(){
+    //console.log(app_handle.getSelectedStat());
+    let body={
+        code:wechat_id
+    };
+    let listreq = {
+        action:"HCU_Start_Loop",
+        body:body,
+        type:"query",
+        user:"activeuser"
+    };
+    fetch(request_head,
+        {
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(listreq)
+        }).then(jsonParse)
+        .then(startloop_callback)
+        .catch( (error) => {
+            console.log('request error', error);
+            return { error };
+        });
+}
+function loopstatus_callback(res){
+    if(res.jsonResult.status == "false"){
+        return;
+    }
+    if(res.jsonResult.auth == "false"){
+        return;
+    }
+    let loop_status = res.jsonResult.ret;
+    if(loop_status === "true"){
+        Loop_second =0;
+        app_handle.loop_result(true);
+    }else if(loop_status === "false"){
+        Loop_second =0;
+        app_handle.loop_result(false);
+    }else{
+        app_handle.loop_second(Loop_second);
+        Loop_second++;
+        if(Loop_second >30){
+            Loop_second =0;
+            app_handle.loop_result(false);
+        }else{
+            Loophandle = setTimeout(function(){
+                fetchloopstatus();
+            },1000);
+        }
+    }
+
+
+}
+function fetchloopstatus(){
+    //console.log(app_handle.getSelectedStat());
+    let body={
+        code:wechat_id
+    };
+    let listreq = {
+        action:"HCU_Loop_Status",
+        body:body,
+        type:"query",
+        user:"activeuser"
+    };
+    fetch(request_head,
+        {
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(listreq)
+        }).then(jsonParse)
+        .then(loopstatus_callback)
+        .catch( (error) => {
+            console.log('request error', error);
+            return { error };
+        });
+}
+function reboot_callback(res){
+    if(res.jsonResult.status == "false"){
+        alert("重启失败，请联系管理员");
+        return;
+    }
+    if(res.jsonResult.auth == "false"){
+        alert("重启失败，请联系管理员");
+        return;
+    }
+    alert("重启成功，请稍后刷新状态");
+
+}
+function fetchreboot(){
+    //console.log(app_handle.getSelectedStat());
+    let body={
+        code:wechat_id
+    };
+    let listreq = {
+        action:"HCU_Reboot",
+        body:body,
+        type:"query",
+        user:app_handle.getuser()
+    };
+    fetch(request_head,
+        {
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(listreq)
+        }).then(jsonParse)
+        .then(reboot_callback)
+        .catch( (error) => {
+            console.log('request error', error);
+            return { error };
+        });
+}
 var hexcase = 0; /* hex output format. 0 - lowercase; 1 - uppercase     */
 var b64pad = ""; /* base-64 pad character. "=" for strict RFC compliance  */
 var chrsz = 8; /* bits per input character. 8 - ASCII; 16 - Unicode    */

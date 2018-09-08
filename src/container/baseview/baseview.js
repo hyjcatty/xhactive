@@ -26,11 +26,14 @@ export default class baseview extends Component {
             hide:"block",
             info:[],
             clickcallback:null,
-            sysconfcallback:null
+            sysconfcallback:null,
+            rebindcallback:null,
+            loopcallback:null,
+            rebootcallback:null
         }
     }
-    updatecallback(callback,callback2){
-        this.setState({clickcallback:callback,sysconfcallback:callback2});
+    updatecallback(callback,callback2,callback3,callback4,callback5){
+        this.setState({clickcallback:callback,sysconfcallback:callback2,rebindcallback:callback3,loopcallback:callback4,rebootcallback:callback5});
     }
     update_size(width,height){
         this.setState({height:height,width:width});
@@ -52,6 +55,15 @@ export default class baseview extends Component {
     handleClick2(){
         this.state.sysconfcallback();
         //TODO: changeview
+    }
+    handleClick3(){
+        this.state.rebindcallback();
+    }
+    handleClick4(){
+        this.state.loopcallback();
+    }
+    handleClick5(){
+        this.state.rebootcallback();
     }
     render() {
         let infodata = [];
@@ -76,10 +88,26 @@ export default class baseview extends Component {
                     </div>
                 </div>
                 <div className="col-xs-12 col-md-12 col-sm-12 col-lg-12" >
-                    <button type="button" data-loading-text="确定" className="btn btn-primary" autoComplete="off" style={{width:"100%"}} onClick={this.handleClick2.bind(this)}>
-                        校准
+                    <button type="button" data-loading-text="确定" className="btn btn-primary" autoComplete="off" style={{width:"100%",marginBottom:"15px"}} onClick={this.handleClick2.bind(this)}>
+                        校准配置
                     </button>
                 </div>
+                <div className="col-xs-12 col-md-12 col-sm-12 col-lg-12" >
+                    <button type="button" data-loading-text="确定" className="btn btn-primary" autoComplete="off" style={{width:"100%",marginBottom:"15px"}} onClick={this.handleClick3.bind(this)}>
+                        重新绑定
+                    </button>
+                </div>
+                <div className="col-xs-12 col-md-12 col-sm-12 col-lg-12" >
+                    <button type="button" data-loading-text="确定" className="btn btn-primary" autoComplete="off" style={{width:"100%",marginBottom:"15px"}} onClick={this.handleClick4.bind(this)}>
+                        回环测试
+                    </button>
+                </div>
+                <div className="col-xs-12 col-md-12 col-sm-12 col-lg-12" >
+                    <button type="button" data-loading-text="确定" className="btn btn-primary" autoComplete="off" style={{width:"100%",marginBottom:"15px"}} onClick={this.handleClick5.bind(this)}>
+                        重启设备
+                    </button>
+                </div>
+
             </div>
         );
     }

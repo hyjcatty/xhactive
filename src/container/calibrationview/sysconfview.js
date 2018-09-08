@@ -29,7 +29,8 @@ export default class sysconfview extends Component {
             configure:null,
             key:"sys_conf_key",
             key2:"sys_conf_input",
-            callbackSave:null
+            callbackSave:null,
+            callbackBack:null
         }
         //this.keyboard_initialize();
     }
@@ -103,11 +104,17 @@ export default class sysconfview extends Component {
     update_callback_save(callback){
         this.setState({callbackSave:callback})
     }
-
+    update_callback_back(callback){
+        this.setState({callbackBack:callback})
+    }
     handle_click_save(){
         let newconf = this.getUpdatedValue();
         if(newconf===null) return;
         this.state.callbackSave(newconf);
+
+    }
+    handle_click_back(){
+        this.state.callbackBack();
 
     }
     render() {
@@ -229,9 +236,14 @@ export default class sysconfview extends Component {
 
         return (
             <div style={{position:"relative",background:"#FFFFFF",height:this.state.height,maxHeight:this.state.height,width:'100%',display:this.state.hide,overflow:'hidden',overflowX:'hidden'}}>
-                <div className="col-xs-12 col-md-12 col-sm-12 col-lg-12" style={{marginTop:15}}>
+                <div className="col-xs-6 col-md-6 col-sm-6 col-lg-6" style={{marginTop:15}}>
                     <button  type="button" className="btn btn-warning btn-sm pull-right" style={{width:"100%",display:this.state.hideSave}} disabled={this.state.disabled} onClick={this.handle_click_save.bind(this)}>
                         <i className="fa fa-save" style={{fontSize:25}}> </i>
+                    </button>
+                </div>
+                <div className="col-xs-6 col-md-6 col-sm-6 col-lg-6" style={{marginTop:15}}>
+                    <button  type="button" className="btn btn-warning btn-sm pull-right" style={{width:"100%",display:this.state.hideSave}} disabled={this.state.disabled} onClick={this.handle_click_back.bind(this)}>
+                        <i className="fa fa-backward" style={{fontSize:25}}> </i>
                     </button>
                 </div>
                 <div id='sysconfview'   style={{float: "left",position:"relative",width:"100%",height:(this.state.height-53),overflowY:"auto",overflowX:"hidden"}}>

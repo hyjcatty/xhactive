@@ -45,14 +45,20 @@ export default class stationview extends Component {
                 'Stage':'--'
             },
             finialselectedcode:"--",
-            clickcallback:null
+            clickcallback:null,
+            clickcallback2:null,
+            binding:null
         }
+    }
+    updatebinding(station){
+
+        this.setState({binding:station});
     }
     getSelectedStat(){
         return this.state.finialselectedcode;
     }
-    updatecallback(callback){
-        this.setState({clickcallback:callback});
+    updatecallback(callback,callback2){
+        this.setState({clickcallback:callback,clickcallback2:callback2});
     }
     update_size(width,height){
         this.setState({height:height,width:width});
@@ -99,15 +105,15 @@ export default class stationview extends Component {
     }
     handleChangeproj(){
         let projchoiced = $("#ProjChoice").val();
-        console.log("projchoiced:"+projchoiced);
+        //console.log("projchoiced:"+projchoiced);
         let outputlist = [];
-        console.log(this);
+        //console.log(this);
         for(let i=0;i<this.state.freestationlist.length;i++){
             if(projchoiced == this.state.freestationlist[i].ProjCode){
                 outputlist.push(<option value={this.state.freestationlist[i].StatCode} key = {"stat"+this.state.freestationlist[i].StatCode}>{this.state.freestationlist[i].StatName}</option>);
             }
         }
-        console.log("statoption:"+outputlist);
+        //console.log("statoption:"+outputlist);
         this.setState({statoption:outputlist},this.handleChangestat);
     }
     handleChangestat(){
@@ -124,16 +130,48 @@ export default class stationview extends Component {
         this.state.clickcallback();
         //TODO: changeview
     }
+    handleClick2(){
+        //console.log("click 2")
+        this.state.clickcallback2();
+    }
     render() {
-        return (
-            <div style={{position:"relative",background:"#ffffff",height:this.state.height,maxHeight:this.state.height,width:'100%',display:this.state.hide,overflow:'scroll',overflowX:'hidden'}}>
+        let binded="";
+        //console.log(this.state.binding);
+        if(this.state.binding !== null){
+            binded =
+                <div style={{position:"relative",background:"#ffffff",height:this.state.height,maxHeight:this.state.height,width:'100%',display:this.state.hide,overflow:'scroll',overflowX:'hidden'}}>
+                    <div className="col-xs-12 col-md-12 col-sm-12 col-lg-12" >
+                        <div className="count" style={{fontSize:32,color:this.state.color,textAlign:"center",width:"100%",marginLeft:"0px",marginTop:"15px"}}>设备已绑定</div>
+
+                        <div className="animated flipInY" style={{paddingTop:15}}>
+                            <div className="tile-stats">
+                                <h3 style={{fontSize:16,paddingTop:10,marginRight:"5px",color:"#3498db",width:"100%",fontWeight:"bold"}} className="pull-left">{"设备绑定到："+this.state.binding.StatCode}</h3>
+                                <div className="count" style={{fontSize:32,color:this.state.color,textAlign:"center",width:"100%",marginLeft:"0px"}}>{this.state.binding.StatName}</div>
+                                <p style={{fontSize:16,paddingTop:0,paddingLeft:10,fontWeight:"bold",color:"#333",marginLeft:"15px",marginTop:"-5px",width:"100%"}} className="pull-right">{"项目："+this.state.binding.ProjCode}</p>
+                                <p style={{fontSize:16,paddingTop:0,paddingLeft:10,fontWeight:"bold",color:"#333",marginLeft:"15px",marginTop:"-5px",width:"100%"}} className="pull-right">{"单位："+this.state.binding.Department}</p>
+                                <p style={{fontSize:16,paddingTop:0,paddingLeft:10,fontWeight:"bold",color:"#333",marginLeft:"15px",marginTop:"-5px",width:"100%"}} className="pull-right">{"地址："+this.state.binding.Address}</p>
+                                <p style={{fontSize:16,paddingTop:0,paddingLeft:10,fontWeight:"bold",color:"#333",marginLeft:"15px",marginTop:"-5px",width:"100%"}} className="pull-right">{"区县："+this.state.binding.Country}</p>
+                                <p style={{fontSize:16,paddingTop:0,paddingLeft:10,fontWeight:"bold",color:"#333",marginLeft:"15px",marginTop:"-5px",width:"100%"}} className="pull-right">{"街镇："+this.state.binding.Street}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-xs-12 col-md-12 col-sm-12 col-lg-12" >
+                        <button type="button" data-loading-text="确定" className="btn btn-primary" autoComplete="off" style={{width:"100%"}} onClick={this.handleClick2.bind(this)}>
+                    解除绑定
+                    </button>
+                    </div>
+                </div>
+        }else{
+            binded =<div style={{position:"relative",background:"#ffffff",height:this.state.height,maxHeight:this.state.height,width:'100%',display:this.state.hide,overflow:'scroll',overflowX:'hidden'}}>
                 <div className="col-xs-12 col-md-12 col-sm-12 col-lg-12" >
+
+                    <div className="count" style={{fontSize:32,color:this.state.color,textAlign:"center",width:"100%",marginLeft:"0px",marginTop:"15px"}}>设备未绑定</div>
                     <div className="count" style={{fontSize:20,marginTop:15,verticalAlign:'bottom',width:"90%"}} >
                         <div className="input-group">
                             <span className="input-group-addon"  style={{minWidth: "100px",fontSize:"12px"}}>{"项目:"}</span>
                             <select className="form-control"  placeholder="CONFIG Value" aria-describedby="basic-addon1" id="ProjChoice"
                                     onChange={this.handleChangeproj.bind(this)}
-                                    >{this.state.projoption}</select>
+                            >{this.state.projoption}</select>
                         </div>
                     </div>
                     <div className="count" style={{fontSize:20,marginTop:15,verticalAlign:'bottom',width:"90%"}} >
@@ -141,7 +179,7 @@ export default class stationview extends Component {
                             <span className="input-group-addon"  style={{minWidth: "100px",fontSize:"12px"}}>{"站点:"}</span>
                             <select className="form-control" placeholder="CONFIG Value" aria-describedby="basic-addon1" id="StatChoice"
                                     onChange={this.handleChangestat.bind(this)}
-                                    >{this.state.statoption}</select>
+                            >{this.state.statoption}</select>
                         </div>
                     </div>
 
@@ -167,6 +205,10 @@ export default class stationview extends Component {
                     </button>
                 </div>
             </div>
+        }
+        return (
+            <div>
+                {binded}</div>
         );
     }
 }
