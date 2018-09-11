@@ -98,10 +98,14 @@ switch ($key){
                 $y=rand(0,1);
                 $cpuactive = 'false';
                 if($y==1) $cpuactive='true';
+                $y=rand(0,1);
+                $stationactive = 'false';
+                if($y==1) $stationactive='true';
                 $user=array(
                     'username'=> 'Liuzehong',
                     'userid'=>'123123123',
-                    'CPU'=>$cpuactive
+                    'CPU'=>$cpuactive,
+                    'station'=>$stationactive
                 );
                 $x=rand(1,5);
                 $sta = 'false';
@@ -115,6 +119,44 @@ switch ($key){
 
                 $jsonencode = _encode($retval);
                 echo $jsonencode; break;
+    case "HCU_Session_Binding": //Use Wechat to login the Server, response is the userID in system.
+            /*
+                 var body = {
+                                code:DevCode,
+                                session:session};
+                 var map={
+                 action:"HCU_Session_Binding",
+                 type:"query",
+                 body: body,
+                 user:"null"
+                 };
+                * */
+                    $body=$payload["body"];
+                    $openid = "12312312312312312312";
+                    $y=rand(0,1);
+                    $cpuactive = 'false';
+                    if($y==1) $cpuactive='true';
+                    $y=rand(0,1);
+                    $stationactive = 'false';
+                    if($y==1) $stationactive='true';
+                    $user=array(
+                        'username'=> 'Liuzehong',
+                        'userid'=>'123123123',
+                        'CPU'=>$cpuactive,
+                        'station'=>$stationactive
+                    );
+                    $x=rand(1,5);
+                    $sta = 'false';
+                    if($x>2) $sta='true';
+                    $retval=array(
+                        'status'=>$sta,
+                        'auth'=>'true',
+                        'ret'=>$user,
+                        'msg'=>'12345'
+                    );
+
+                    $jsonencode = _encode($retval);
+                    echo $jsonencode; break;
     case "HCU_CPU_Binding": //Use Wechat to login the Server, response is the userID in system.
         /*
              var body = {
@@ -175,7 +217,7 @@ switch ($key){
         */
             $retlist =array();
             $randdata = rand(1000,9999);
-            for($i=1;$i<20;$i++){
+            for($i=1;$i<10;$i++){
                 $map="项目:".(string)$randdata.(string)$i.'sssss';
                 array_push($retlist,$map);
             }
@@ -217,6 +259,33 @@ switch ($key){
             );
             $jsonencode = _encode($retval);
             echo $jsonencode; break;
+    case "HCU_Get_Binding_Station":
+        $i=400;
+        $projcode = ($i)%14;
+        $temp = array(
+            'StatCode'=> (string)(($i+1)),
+            'StatName'=>"测量点".(string)($i),
+            'ProjCode'=> $projcode,
+            'ChargeMan'=>"用户".(string)($i),
+            'Telephone'=>"139139".(string)($i),
+            'Longitude'=>"121.0000",
+            'Latitude'=>"31.0000",
+            'Department'=>"单位".(string)($i),
+            'Address'=>"地址".(string)($i),
+            'Country'=>"区县".(string)($i),
+            'Street'=>"街镇".(string)($i),
+            'Square'=>"10000",
+            'ProStartTime'=>"2016-01-01",
+            'Stage'=>"备注".(string)($i)
+        );
+        $retval=array(
+            'status'=>'true',
+            'ret'=>$temp,
+            'auth'=>'true',
+            'msg'=>'123456'
+        );
+        $jsonencode = _encode($retval);
+        echo $jsonencode; break;
     case "HCU_Get_Free_Station":
 
         $pointtable = array();
@@ -267,12 +336,23 @@ switch ($key){
     	$jsonencode = _encode($retval);
     	echo $jsonencode; break;
     case "HCU_Lock_close": //Close a lock
-    case "HCU_Lock_Activate": //Open a lock
+    case "HCU_Station_Bind": //Open a lock
             $body=$payload["body"];
             $code=$body["code"];
             $ret_stat = "false";
             $i=_getfilecounts('./upload/'.$code.'/');
             if($i>=2) $ret_stat = "true";
+            $retval=array(
+                'status'=>$ret_stat,
+                'auth'=>'true',
+                'msg'=>'123456'
+            );
+            $jsonencode = _encode($retval);
+            echo $jsonencode; break;
+    case "HCU_Station_Unbind": //Open a lock
+            $body=$payload["body"];
+            $code=$body["code"];
+            $ret_stat = "true";
             $retval=array(
                 'status'=>$ret_stat,
                 'auth'=>'true',
@@ -308,6 +388,47 @@ switch ($key){
         $jsonencode = _encode($retval);
 
         echo $jsonencode; break;
+    case "HCU_Loop_Status": //Query A Lock status by statCode.
+            $body=$payload["body"];
+            $id=$payload["user"];
+            $code=$body["code"];
+            $temp = rand(0,10);
+            $locked = 'pending';
+            if($temp == 5){
+                $locked = 'false';
+            }else if($temp >= 9){
+                $locked = 'true';
+            }
+            $retval=array(
+                'status'=>'true',
+                'auth'=>'true',
+                'msg'=>'',
+                'ret'=>$locked
+            );
+            $jsonencode = _encode($retval);
+            echo $jsonencode; break;
+    case "HCU_Start_Loop": //Query A Lock status by statCode.
+            $body=$payload["body"];
+            $id=$payload["user"];
+            $code=$body["code"];
+            $retval=array(
+                'status'=>'true',
+                'auth'=>'true',
+                'msg'=>''
+            );
+            $jsonencode = _encode($retval);
+            echo $jsonencode; break;
+    case "HCU_Reboot": //Query A Lock status by statCode.
+            $body=$payload["body"];
+            $id=$payload["user"];
+            $code=$body["code"];
+            $retval=array(
+                'status'=>'true',
+                'auth'=>'true',
+                'msg'=>''
+            );
+            $jsonencode = _encode($retval);
+            echo $jsonencode; break;
 	default:
 	break;
 }
