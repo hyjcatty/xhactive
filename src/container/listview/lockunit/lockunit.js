@@ -33,7 +33,7 @@ export default class Lockunit extends Component {
         return (
             <div  style={{position:"relative",flex:1,width:this.state.winwidth,border: "1px solid #EAEAEA",boxShadow:"2px 2px 1px #EAEAEA",background:"#FFFFFF"}} >
                 <div   style={{margin:10}}>
-                    <button type="button" className="btn btn-success btn-xs" style={{height:"30px",width:"45px",verticalAlign:"middle"}} onClick={this.handle_click.bind(this)}><i className="fa fa-link"> </i></button>
+                    <button type="button" className="btn btn-success btn-xs" style={{height:"30px",width:"45px",verticalAlign:"middle"}} onClick={this.handle_click.bind(this)}><i>绑定 </i></button>
                     <a className="framelabel" style={{marginLeft:"15px",verticalAlign:"middle"}}>{this.state.cpuname} </a>
                 </div>
                 <div style={{margin:10}}>

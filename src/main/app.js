@@ -100,6 +100,9 @@ class App extends Component{
         if(this.state.cpuactive) return "设备未绑定网关";
         else return "设备已绑定网关";
     }
+    initializeActivate(backcallback){
+        this.refs.Activateview.update_callback(backcallback);
+    }
     initializesysconf(savecallback,backcallback,configuration){
 
         this.refs.Sysconfview.update_callback_save(savecallback);
@@ -314,6 +317,7 @@ app_handle.initializeLogin(login_binding);
 app_handle.initializefoot(shift);
 app_handle.initializeloop(wechat_id,fetchstartloop,hcubacksysconf);
 app_handle.updateactivecode(wechat_id);
+app_handle.initializeActivate(re_login);
 if(session_id !== null){
     session_binding(session_id);
 }else{
@@ -432,13 +436,13 @@ function query_callback(res){
     }
     if(res.jsonResult.auth == "false"){
         app_handle.updateactivestatus(false);
-        app_handle.updateactivenotes("激活失败:"+res.jsonResult.msg);
+        app_handle.updateactivenotes("激活失败:["+res.jsonResult.msg+"],点击屏幕中央返回初始界面。");
         cycle_number = 101;
         return;
     }
     app_handle.showactiveview();
     app_handle.updateactivestatus(true);
-    app_handle.updateactivenotes("设备已激活！");
+    app_handle.updateactivenotes("设备已激活！点击屏幕中央返回初始界面。");
     //alert("设备已激活！");
     cycle_number = 101;
     return;
@@ -558,6 +562,58 @@ function getSession(){
         }
     }
     return null;
+}
+function re_login(){
+    var body = {
+        code:wechat_id,
+        userid:app_handle.getuser()
+    };
+    var map={
+        action:"HCU_Re_Login",
+        type:"query",
+        body: body,
+        user:"null"
+    };
+
+    fetch(request_head,
+        {
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(map)
+        }).then(jsonParse)
+        .then(re_login_callback)
+        //.then(fetchlist)
+        .catch( (error) => {
+            console.log('request error', error);
+            return { error };
+        });
+}
+function re_login_callback(res){
+    if(res.jsonResult.status == "false"){
+        alert("校验出错"+res.jsonResult.msg);
+        return;
+    }
+    if(res.jsonResult.auth == "false"){
+        alert("重登陆错误"+res.jsonResult.msg);
+        return;
+    }
+    let userinfo = res.jsonResult.ret;
+    app_handle.setuser(userinfo.username,userinfo.userid);
+    let cpu=false;
+    let station=false;
+    if(userinfo.CPU === "true") cpu = true;
+    if(userinfo.station === "true") station = true;
+    app_handle.update_cpu_active(cpu);
+    app_handle.update_station_active(station);
+    if(station){
+        fetchstation();
+    }else{
+        app_handle.showstationview();
+    }
+    //fetchlist();
 }
 function login_binding(username,password){
 

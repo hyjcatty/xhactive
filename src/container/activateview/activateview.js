@@ -28,7 +28,11 @@ export default class activateview extends Component {
             cycle:30,
             interval:0,
             hide:"block",
+            backcallback:null
         }
+    }
+    update_callback(callback){
+        this.setState({backcallback:callback});
     }
     update_size(width,height){
         this.setState({height:height,width:width,title_height:height*0.3,button_height:height*0.5,note_height:height*0.2});
@@ -42,6 +46,9 @@ export default class activateview extends Component {
     }
     update_status(status){
         this.setState({activated:status});
+    }
+    handleback(){
+        this.state.backcallback();
     }
     hide(){
         this.setState({hide:"none"});
@@ -60,7 +67,7 @@ export default class activateview extends Component {
                     </div>
                     <div style={{clear:"both"}}></div>
                 </div>
-                <div style={{position:"relative",width:'100%',height:this.state.button_height,textAlign : 'center',display:"table"}}>
+                <div style={{position:"relative",width:'100%',height:this.state.button_height,textAlign : 'center',display:"table"}} onClick={this.handleback.bind(this)}>
                     <div className="lockbutton" style={{position:"relative",height:this.state.button_height, fontSize:this.state.height/3,float:"left",display:"table-cell",verticalAlign:"middle",margin:"auto"}} >
                         {button}
                     </div>

@@ -119,6 +119,43 @@ switch ($key){
 
                 $jsonencode = _encode($retval);
                 echo $jsonencode; break;
+    case "HCU_Re_Login": //Use Wechat to login the Server, response is the userID in system.
+                /*
+                     var body = {
+                             code:wechat_id,
+                             userid:app_handle.getuser()
+                         };
+                     var map={
+                     action:"HCU_Session_Binding",
+                     type:"query",
+                     body: body,
+                     user:"null"
+                     };
+                    * */
+                        $body=$payload["body"];
+                        $openid = "12312312312312312312";
+                        $y=rand(0,1);
+                        $cpuactive = 'false';
+                        if($y==1) $cpuactive='true';
+                        $y=rand(0,1);
+                        $stationactive = 'false';
+                        if($y==1) $stationactive='true';
+                        $user=array(
+                            'username'=> 'Liuzehong',
+                            'userid'=>'123123123',
+                            'CPU'=>$cpuactive,
+                            'station'=>$stationactive
+                        );
+                        $sta='true';
+                        $retval=array(
+                            'status'=>$sta,
+                            'auth'=>'true',
+                            'ret'=>$user,
+                            'msg'=>'12345'
+                        );
+
+                        $jsonencode = _encode($retval);
+                        echo $jsonencode; break;
     case "HCU_Session_Binding": //Use Wechat to login the Server, response is the userID in system.
             /*
                  var body = {
