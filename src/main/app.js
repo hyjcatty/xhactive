@@ -43,11 +43,15 @@ class App extends Component{
             username:"Activate",
             hculist: [],
             cpuactive:false,
-            stationactive:false
+            stationactive:false,
+            getlocationcallback:null
         };
     }
     getuser(){
         return this.state.userid;
+    }
+    getlocationcallback(callback){
+        this.setState({getlocationcallback:callback});
     }
     initializeSize(width,height){
         let winlength= (width>height)?width:height;
@@ -199,6 +203,7 @@ class App extends Component{
         this.refs.Baseview.hide();
 
         this.refs.foot.update_content("上传照片以完成激活");
+        this.state.getlocationcallback();
     }
     showstationview(){
         this.refs.Loopview.hide();
@@ -318,12 +323,13 @@ app_handle.initializefoot(shift);
 app_handle.initializeloop(wechat_id,fetchstartloop,hcubacksysconf);
 app_handle.updateactivecode(wechat_id);
 app_handle.initializeActivate(re_login);
+app_handle.getlocationcallback(getLocation);
 if(session_id !== null){
     session_binding(session_id);
 }else{
     app_handle.showloginview();
 }
-getLocation();
+//getLocation();
 
 
 function get_size(){
@@ -366,6 +372,8 @@ function getRelativeURL(){
 function getLocation()
 {
     //alert("正在获取位置！");
+    clearInterval(Intervalhandle);
+    cycle_number=0;
     app_handle.updateactivenotes("正在获取位置！");
     /*
     if (navigator.geolocation)
