@@ -124,9 +124,9 @@ class App extends Component{
         this.refs.Listview.update_locklist(map);
         this.refs.Listview.updatecallback(callback);
     }
-    initializeBase(map,callback,callback2,callback3,callback4,callback5){
+    initializeBase(map,callback,callback2,callback3,callback4,callback5,callback6,callback7){
         this.refs.Baseview.update_info(map);
-        this.refs.Baseview.updatecallback(callback,callback2,callback3,callback4,callback5);
+        this.refs.Baseview.updatecallback(callback,callback2,callback3,callback4,callback5,callback6,callback7);
     }
     initializefoot(callback){
         this.refs.foot.update_callback(callback);
@@ -854,7 +854,7 @@ function info_callback(res){
         return;
     }
     let getinfolist = res.jsonResult.ret;
-    app_handle.initializeBase(getinfolist,fetchinfo,sysconffetch,fetchlist,showloop,fetchreboot);
+    app_handle.initializeBase(getinfolist,fetchinfo,sysconffetch,fetchlist,showloop,fetchreboot,fetchNGROK,fetchsoftreboot);
 
     app_handle.showbaseview();
     //app_handle.listview();
@@ -1173,6 +1173,82 @@ function fetchreboot(){
             body:JSON.stringify(listreq)
         }).then(jsonParse)
         .then(reboot_callback)
+        .catch( (error) => {
+            console.log('request error', error);
+            return { error };
+        });
+}
+function NGROK_callback(res){
+    if(res.jsonResult.status == "false"){
+        alert("NGROK重启失败，请联系管理员");
+        return;
+    }
+    if(res.jsonResult.auth == "false"){
+        alert("NGROK重启失败，请联系管理员");
+        return;
+    }
+    alert("NGROK重启成功，请稍后刷新状态");
+
+}
+function fetchNGROK(){
+    //console.log(app_handle.getSelectedStat());
+    let body={
+        code:wechat_id
+    };
+    let listreq = {
+        action:"HCU_NGROK",
+        body:body,
+        type:"query",
+        user:app_handle.getuser()
+    };
+    fetch(request_head,
+        {
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(listreq)
+        }).then(jsonParse)
+        .then(NGROK_callback)
+        .catch( (error) => {
+            console.log('request error', error);
+            return { error };
+        });
+}
+function softreboot_callback(res){
+    if(res.jsonResult.status == "false"){
+        alert("软重启失败，请联系管理员");
+        return;
+    }
+    if(res.jsonResult.auth == "false"){
+        alert("软重启失败，请联系管理员");
+        return;
+    }
+    alert("软重启成功，请稍后刷新状态");
+
+}
+function fetchsoftreboot(){
+    //console.log(app_handle.getSelectedStat());
+    let body={
+        code:wechat_id
+    };
+    let listreq = {
+        action:"HCU_Software_Reboot",
+        body:body,
+        type:"query",
+        user:app_handle.getuser()
+    };
+    fetch(request_head,
+        {
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(listreq)
+        }).then(jsonParse)
+        .then(softreboot_callback)
         .catch( (error) => {
             console.log('request error', error);
             return { error };

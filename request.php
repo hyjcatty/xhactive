@@ -466,6 +466,28 @@ switch ($key){
             );
             $jsonencode = _encode($retval);
             echo $jsonencode; break;
+    case "HCU_NGROK": //Query A Lock status by statCode.
+            $body=$payload["body"];
+            $id=$payload["user"];
+            $code=$body["code"];
+            $retval=array(
+                'status'=>'true',
+                'auth'=>'true',
+                'msg'=>''
+            );
+            $jsonencode = _encode($retval);
+            echo $jsonencode; break;
+    case "HCU_Software_Reboot": //Query A Lock status by statCode.
+            $body=$payload["body"];
+            $id=$payload["user"];
+            $code=$body["code"];
+            $retval=array(
+                'status'=>'true',
+                'auth'=>'true',
+                'msg'=>''
+            );
+            $jsonencode = _encode($retval);
+            echo $jsonencode; break;
 	default:
 	break;
 }
